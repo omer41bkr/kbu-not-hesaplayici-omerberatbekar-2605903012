@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBÜ Not Hesaplayıcı | Karabük Üniversitesi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="container">
+        <!-- Başlık Bölümü -->
+        <header class="header">
+            <span class="badge-uni">Karabük Üniversitesi</span>
+            <h1>Ders Notu Hesaplayıcı</h1>
+            <p class="subtitle">Önlisans ve Lisans Yönetmeliğine Göre Vize, Final ve Bütünleme Notu Hesaplama</p>
+        </header>
+
+        <!-- Hesaplama Kartı -->
+        <div class="card">
+            <form id="notForm" novalidate>
+                
+                <!-- Hata Bildirim Alanı -->
+                <div id="hataKutusu" class="hata-kutusu" style="display: none;" role="alert"></div>
+
+                <!-- Not Girdi Alanları -->
+                <div class="form-grid">
+                    <!-- Vize Notu -->
+                    <div class="form-group">
+                        <label for="vizeNotu">Vize / Ara Sınav Notu <span class="required">*</span></label>
+                        <input type="number" id="vizeNotu" name="vizeNotu" min="0" max="100" step="any" placeholder="0 - 100">
+                        <small class="helper-text">Zorunlu alan (%40 ağırlık)</small>
+                    </div>
+
+                    <!-- Yıl İçi Çalışma Notu (Opsiyonel) -->
+                    <div class="form-group">
+                        <label for="calismaNotu">Yıl İçi Çalışma / Ödev <span class="optional">(Opsiyonel)</span></label>
+                        <input type="number" id="calismaNotu" name="calismaNotu" min="0" max="100" step="any" placeholder="0 - 100">
+                        <small class="helper-text">Girilmezse vize notu yıl içi kabul edilir</small>
+                    </div>
+
+                    <!-- Final Notu -->
+                    <div class="form-group">
+                        <label for="finalNotu">Final Sınav Notu <span class="required">*</span></label>
+                        <input type="number" id="finalNotu" name="finalNotu" min="0" max="100" step="any" placeholder="0 - 100">
+                        <small id="finalHelper" class="helper-text">Bütünleme girilirse devre dışı kalır</small>
+                    </div>
+
+                    <!-- Bütünleme Notu (Opsiyonel) -->
+                    <div class="form-group">
+                        <label for="butunlemeNotu">Bütünleme Notu <span class="optional">(Opsiyonel)</span></label>
+                        <input type="number" id="butunlemeNotu" name="butunlemeNotu" min="0" max="100" step="any" placeholder="0 - 100">
+                        <small class="helper-text">Girildiğinde final yerine hesaplamaya katılır</small>
+                    </div>
+                </div>
+
+                <!-- Durum Seçenekleri (Devam ve Sınava Katılım) -->
+                <div class="durum-grid">
+                    <div class="form-group">
+                        <label for="sinavaGirdi">Genel / Bütünleme Sınavına Girdiniz mi?</label>
+                        <select id="sinavaGirdi" name="sinavaGirdi" class="select-input">
+                            <option value="evet" selected>Evet, girdim</option>
+                            <option value="hayir">Hayır, girmedim (F2)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label" for="devamsizCheck">
+                            <input type="checkbox" id="devamsizCheck" name="devamsizCheck">
+                            <span>Devamsızım (F1)</span>
+                        </label>
+                        <small class="helper-text">İşaretlenirse doğrudan F1 ile kalınır</small>
+                    </div>
+                </div>
+
+                <!-- İşlem Butonları -->
+                <div class="btn-group">
+                    <button type="submit" id="btnHesapla" class="btn btn-primary">Hesapla</button>
+                    <button type="button" id="btnSifirla" class="btn btn-secondary">Sıfırla</button>
+                </div>
+            </form>
+
+            <!-- Sonuç Kartı -->
+            <section id="sonucKarti" class="sonuc-karti" style="display: none;" aria-live="polite">
+                <div class="sonuc-header">
+                    <h2 class="sonuc-baslik">Hesaplama Sonucu</h2>
+                    <span id="durumBadge" class="badge">Geçti</span>
+                </div>
+
+                <div class="sonuc-detay-grid">
+                    <div class="sonuc-kutucuk">
+                        <span class="sonuc-etiket">Başarı Notu</span>
+                        <span id="sonucBasariNotu" class="sonuc-deger">-</span>
+                    </div>
+
+                    <div class="sonuc-kutucuk">
+                        <span class="sonuc-etiket">Harf Notu</span>
+                        <span id="sonucHarfNotu" class="sonuc-deger highlight">-</span>
+                    </div>
+
+                    <div class="sonuc-kutucuk">
+                        <span class="sonuc-etiket">Katsayı</span>
+                        <span id="sonucKatsayi" class="sonuc-deger">-</span>
+                    </div>
+
+                    <div class="sonuc-kutucuk">
+                        <span class="sonuc-etiket">Esas Alınan Sınav</span>
+                        <span id="sonucSinavTuru" class="sonuc-deger">-</span>
+                    </div>
+                </div>
+
+                <div class="aciklama-kutusu">
+                    <strong>Durum Açıklaması:</strong>
+                    <p id="sonucAciklama">-</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Bilgilendirme ve Kural Tablosu -->
+        <section class="info-card">
+            <h3>KBÜ Not Değerlendirme Kuralları</h3>
+            <ul class="kural-listesi">
+                <li><strong>Ağırlıklar:</strong> Yıl içi puanı %40, Final/Bütünleme sınavı %60 etkilidir.</li>
+                <li><strong>Geçme Şartı 1:</strong> Genel veya Bütünleme sınav notu en az <strong>50</strong> olmalıdır.</li>
+                <li><strong>Geçme Şartı 2:</strong> Ders başarı notu en az <strong>60</strong> olmalıdır.</li>
+                <li><strong>Bütünleme:</strong> Bütünleme notu girildiğinde, final notu yerine geçer (%60 etki).</li>
+                <li><strong>F Notları:</strong> F1 (Devamsız), F2 (Sınava girmedi), F3 (Sınav &lt; 50 veya Başarı &lt; 60).</li>
+            </ul>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Karabük Üniversitesi Bilgisayar Mühendisliği | Web Programlama Ödevi</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
